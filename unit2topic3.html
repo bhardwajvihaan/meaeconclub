@@ -1,184 +1,442 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>MEA Economics Club: Price Elasticity of Demand Quiz</title>
-  <style>
-    body { font-family: Arial, sans-serif; background: #f4f4f4; padding: 20px; }
-    h1 { color: #003366; }
-    .question { background: #fff; padding: 15px; margin-bottom: 15px; border-radius: 5px; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
-    .question p { margin: 0 0 10px; }
-    button { background: #003366; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; }
-    .result { margin-top: 20px; font-weight: bold; }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MEA Economics Club - Price Elasticity of Demand Quiz (AP Micro 2.3)</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans&display=swap" rel="stylesheet" />
+<style>
+  body {
+    font-family: 'DM Sans', sans-serif;
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 0 15px 50px;
+    background: #f9f9f9;
+    color: #222;
+  }
+  h1 {
+    text-align: center;
+    margin-bottom: 0.3em;
+  }
+  form {
+    background: white;
+    padding: 20px 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 8px #ccc;
+  }
+  .question {
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #ddd;
+  }
+  .question:last-child {
+    border-bottom: none;
+  }
+  .question-title {
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .options label {
+    display: block;
+    margin-bottom: 6px;
+    cursor: pointer;
+  }
+  input[type="number"] {
+    width: 100px;
+    padding: 5px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  .submit-btn {
+    display: block;
+    margin: 30px auto 10px;
+    font-size: 1.1rem;
+    background: #2e7d32;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  .submit-btn:hover {
+    background: #27672a;
+  }
+  .error-msg {
+    color: #d32f2f;
+    font-weight: 600;
+    margin-bottom: 15px;
+    text-align: center;
+  }
+  .feedback {
+    margin-top: 8px;
+    padding: 8px 12px;
+    border-radius: 5px;
+  }
+  .correct {
+    background-color: #d4edda;
+    color: #155724;
+  }
+  .incorrect {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+  .answer-text {
+    font-weight: 600;
+  }
+</style>
 </head>
 <body>
 
-<h1>MEA Economics Club: Price Elasticity of Demand Quiz</h1>
-<p><strong>AP Microeconomics CED Topic:</strong> 2.3 – Price Elasticity of Demand</p>
+<h1>MEA Economics Club - Price Elasticity of Demand Quiz</h1>
+<p style="text-align:center; font-style: italic; margin-bottom: 30px;">AP Microeconomics CED Topic 2.3</p>
 
-<form id="quizForm">
-  <!-- Questions will be inserted here by JavaScript -->
+<form id="quizForm" novalidate>
+  <!-- Questions will be inserted here by JS -->
 </form>
-
-<button onclick="gradeQuiz()">Submit</button>
-<div class="result" id="resultBox"></div>
 
 <script>
   const questions = [
     {
-      type: 'mc',
-      question: "1. What does a price elasticity of demand (PED) greater than 1 indicate?",
-      options: ["Elastic", "Inelastic", "Unit elastic", "Perfectly inelastic"],
+      id: 1,
+      type: "mcq",
+      question: "Price elasticity of demand (PED) measures the responsiveness of:",
+      options: [
+        "Quantity demanded to a change in price",
+        "Price to a change in quantity demanded",
+        "Supply to a change in price",
+        "Demand to a change in income"
+      ],
+      answer: "Quantity demanded to a change in price"
+    },
+    {
+      id: 2,
+      type: "mcq",
+      question: "If PED is greater than 1, demand is considered:",
+      options: [
+        "Inelastic",
+        "Unit elastic",
+        "Elastic",
+        "Perfectly inelastic"
+      ],
       answer: "Elastic"
     },
     {
-      type: 'mc',
-      question: "2. If PED = 0, demand is:",
-      options: ["Perfectly inelastic", "Perfectly elastic", "Unit elastic", "Elastic"],
-      answer: "Perfectly inelastic"
+      id: 3,
+      type: "mcq",
+      question: "When demand is perfectly inelastic, the PED is equal to:",
+      options: [
+        "0",
+        "1",
+        "Infinity",
+        "-1"
+      ],
+      answer: "0"
     },
     {
-      type: 'mc',
-      question: "3. The midpoint formula is used to calculate:",
-      options: ["Cross-price elasticity", "Income elasticity", "Percentage change in demand", "Price elasticity over a range"],
-      answer: "Price elasticity over a range"
+      id: 4,
+      type: "mcq",
+      question: "If a 10% increase in price causes a 5% decrease in quantity demanded, the PED is:",
+      options: [
+        "0.5",
+        "-0.5",
+        "-2",
+        "2"
+      ],
+      answer: "-0.5"
     },
     {
-      type: 'mc',
-      question: "4. If a good has many substitutes, its demand tends to be:",
-      options: ["Elastic", "Inelastic", "Perfectly inelastic", "Unit elastic"],
-      answer: "Elastic"
+      id: 5,
+      type: "number",
+      question: "Calculate the PED if price increases from $4 to $5 and quantity demanded decreases from 200 units to 180 units. (Round to 2 decimals)",
+      answer: "-0.55"
     },
     {
-      type: 'mc',
-      question: "5. What happens to total revenue when price rises and demand is inelastic?",
-      options: ["Increases", "Decreases", "Stays the same", "Becomes negative"],
-      answer: "Increases"
+      id: 6,
+      type: "mcq",
+      question: "If the PED = 1, demand is called:",
+      options: [
+        "Elastic",
+        "Perfectly elastic",
+        "Unit elastic",
+        "Inelastic"
+      ],
+      answer: "Unit elastic"
     },
     {
-      type: 'mc',
-      question: "6. If PED = 1, total revenue is:",
-      options: ["Maximized", "Minimized", "Decreasing", "Increasing"],
-      answer: "Maximized"
-    },
-    {
-      type: 'mc',
-      question: "7. What is the PED for a perfectly elastic good?",
-      options: ["0", "1", "Infinity", "Undefined"],
-      answer: "Infinity"
-    },
-    {
-      type: 'mc',
-      question: "8. Which of the following has likely inelastic demand?",
-      options: ["Salt", "Luxury cars", "Vacations", "Movie tickets"],
+      id: 7,
+      type: "mcq",
+      question: "Which good would most likely have inelastic demand?",
+      options: [
+        "Salt",
+        "Luxury cars",
+        "Restaurant meals",
+        "Movie tickets"
+      ],
       answer: "Salt"
     },
     {
-      type: 'mc',
-      question: "9. In the long run, demand is usually:",
-      options: ["More elastic", "More inelastic", "Perfectly elastic", "Constant"],
-      answer: "More elastic"
+      id: 8,
+      type: "number",
+      question: "If price decreases from $10 to $8 and quantity demanded increases from 500 to 600 units, calculate the PED (use midpoint formula). Round to 2 decimals.",
+      answer: "-1.33"
     },
     {
-      type: 'mc',
-      question: "10. If the PED is less than 1, total revenue will ______ when price increases.",
-      options: ["Increase", "Decrease", "Remain unchanged", "Fluctuate"],
-      answer: "Increase"
+      id: 9,
+      type: "mcq",
+      question: "A PED of zero means:",
+      options: [
+        "Quantity demanded does not change when price changes",
+        "Quantity demanded changes proportionally to price",
+        "Quantity demanded is infinitely responsive to price",
+        "Demand is perfectly elastic"
+      ],
+      answer: "Quantity demanded does not change when price changes"
     },
     {
-      type: 'mc',
-      question: "11. PED can never be:",
-      options: ["Negative", "Positive", "Zero", "Infinity"],
-      answer: "Positive"
+      id: 10,
+      type: "mcq",
+      question: "Total revenue increases when price decreases only if demand is:",
+      options: [
+        "Inelastic",
+        "Elastic",
+        "Unit elastic",
+        "Perfectly inelastic"
+      ],
+      answer: "Elastic"
     },
     {
-      type: 'num',
-      question: "12. Price increases from $10 to $12. Quantity demanded falls from 100 to 80. What is the PED (2 decimal places)?",
-      answer: 0.91
+      id: 11,
+      type: "number",
+      question: "If the price increases by 20% and quantity demanded decreases by 10%, what is the PED? (Round to 2 decimals)",
+      answer: "-0.50"
     },
     {
-      type: 'num',
-      question: "13. Price drops from $50 to $40. Quantity demanded rises from 200 to 300. PED?",
-      answer: 2.20
+      id: 12,
+      type: "mcq",
+      question: "If demand is elastic, what happens to total revenue when price increases?",
+      options: [
+        "Total revenue increases",
+        "Total revenue decreases",
+        "Total revenue stays the same",
+        "Cannot determine"
+      ],
+      answer: "Total revenue decreases"
     },
     {
-      type: 'num',
-      question: "14. Price rises 20%, and quantity demanded falls 10%. PED?",
-      answer: 0.50
+      id: 13,
+      type: "mcq",
+      question: "Which of the following factors increases the price elasticity of demand?",
+      options: [
+        "Few substitutes available",
+        "A large portion of consumer income spent on the good",
+        "Necessity of the good",
+        "Short time period"
+      ],
+      answer: "A large portion of consumer income spent on the good"
     },
     {
-      type: 'num',
-      question: "15. Price falls 25%, and quantity demanded rises 75%. PED?",
-      answer: 3.00
+      id: 14,
+      type: "mcq",
+      question: "If the demand curve is a vertical line, the PED is:",
+      options: [
+        "Elastic",
+        "Inelastic",
+        "Unit elastic",
+        "Perfectly inelastic"
+      ],
+      answer: "Perfectly inelastic"
     },
     {
-      type: 'num',
-      question: "16. Price increases from $30 to $33. Quantity demanded drops from 150 to 135. PED?",
-      answer: 1.00
+      id: 15,
+      type: "mcq",
+      question: "If PED = -0.8, the demand is considered:",
+      options: [
+        "Elastic",
+        "Inelastic",
+        "Unit elastic",
+        "Perfectly elastic"
+      ],
+      answer: "Inelastic"
     },
     {
-      type: 'num',
-      question: "17. Price increases 10%, and quantity demanded falls 15%. PED?",
-      answer: 1.50
+      id: 16,
+      type: "number",
+      question: "Calculate the PED using midpoint method: Price changes from $15 to $10, quantity demanded from 100 to 140 units. Round to 2 decimals.",
+      answer: "-1.14"
     },
     {
-      type: 'num',
-      question: "18. Price drops 20%, and quantity rises 10%. PED?",
-      answer: 0.50
+      id: 17,
+      type: "mcq",
+      question: "Which of these goods is most likely to have a PED close to infinity?",
+      options: [
+        "Perfect substitutes",
+        "Necessities",
+        "Goods with no substitutes",
+        "Goods with brand loyalty"
+      ],
+      answer: "Perfect substitutes"
     },
     {
-      type: 'num',
-      question: "19. Price increases from $60 to $66. Quantity falls from 90 to 81. PED?",
-      answer: 1.00
+      id: 18,
+      type: "mcq",
+      question: "When demand is elastic, the absolute value of PED is:",
+      options: [
+        "Less than 1",
+        "Equal to 1",
+        "Greater than 1",
+        "Equal to 0"
+      ],
+      answer: "Greater than 1"
     },
     {
-      type: 'num',
-      question: "20. Price drops from $80 to $72. Quantity increases from 50 to 65. PED?",
-      answer: 2.38
+      id: 19,
+      type: "number",
+      question: "If a 15% price increase leads to a 30% decrease in quantity demanded, calculate the PED (round to 2 decimals).",
+      answer: "-2.00"
+    },
+    {
+      id: 20,
+      type: "mcq",
+      question: "Which of the following will cause demand to be more elastic?",
+      options: [
+        "Goods that are necessities",
+        "Short time horizons",
+        "Availability of close substitutes",
+        "Small budget share"
+      ],
+      answer: "Availability of close substitutes"
     }
   ];
 
-  // Render questions
-  const form = document.getElementById("quizForm");
-  questions.forEach((q, i) => {
-    const div = document.createElement("div");
-    div.className = "question";
-    div.innerHTML = `<p>${q.question}</p>`;
-    if (q.type === "mc") {
-      q.options.forEach(opt => {
-        div.innerHTML += `<label><input type="radio" name="q${i}" value="${opt}"> ${opt}</label><br>`;
+  const form = document.getElementById('quizForm');
+
+  function createQuestionHTML(q) {
+    let html = `<div class="question" id="q${q.id}">`;
+    html += `<div class="question-title">${q.id}. ${q.question}</div>`;
+    if (q.type === "mcq") {
+      html += `<div class="options">`;
+      q.options.forEach((opt, idx) => {
+        const inputId = `q${q.id}_opt${idx}`;
+        html += `
+          <label for="${inputId}">
+            <input type="radio" name="q${q.id}" id="${inputId}" value="${opt}" />
+            ${opt}
+          </label>
+        `;
       });
-    } else {
-      div.innerHTML += `<input type="number" step="0.01" name="q${i}" placeholder="Enter PED value">`;
+      html += `</div>`;
+    } else if (q.type === "number") {
+      html += `<input type="number" step="any" name="q${q.id}" id="q${q.id}_num" />`;
     }
-    form.appendChild(div);
-  });
+    html += `<div class="feedback" id="feedback${q.id}" style="display:none;"></div>`;
+    html += `</div>`;
+    return html;
+  }
 
-  function gradeQuiz() {
+  function roundToTwo(num) {
+    return Math.round((num + Number.EPSILON) * 100) / 100;
+  }
+
+  function isCloseEnough(input, correct) {
+    // Compare numeric answers allowing small rounding difference
+    const nInput = parseFloat(input);
+    const nCorrect = parseFloat(correct);
+    if (isNaN(nInput) || isNaN(nCorrect)) return false;
+    return Math.abs(nInput - nCorrect) < 0.05; // within 0.05 is accepted
+  }
+
+  function showFeedback() {
     let score = 0;
-    questions.forEach((q, i) => {
-      const inputName = "q" + i;
-      const inputs = document.getElementsByName(inputName);
-      let userAnswer = null;
+    questions.forEach(q => {
+      const feedbackDiv = document.getElementById(`feedback${q.id}`);
+      feedbackDiv.style.display = "block";
 
-      if (q.type === "mc") {
-        for (let input of inputs) {
-          if (input.checked) {
-            userAnswer = input.value.trim();
-            break;
-          }
-        }
-        if (userAnswer === q.answer) score++;
+      let userAnswer;
+      if (q.type === "mcq") {
+        const radios = document.getElementsByName(`q${q.id}`);
+        userAnswer = "";
+        radios.forEach(radio => {
+          if (radio.checked) userAnswer = radio.value;
+        });
       } else {
-        const num = parseFloat(inputs[0].value);
-        if (!isNaN(num) && Math.abs(num - q.answer) <= 0.05) score++;
+        userAnswer = document.querySelector(`input[name="q${q.id}"]`).value.trim();
+      }
+
+      let correct;
+      if (q.type === "number") {
+        correct = q.answer;
+      } else {
+        correct = q.answer;
+      }
+
+      let correctAnswerText = `Correct answer: <span class="answer-text">${correct}</span>`;
+      let yourAnswerText = `Your answer: <span class="answer-text">${userAnswer || "<em>none</em>"}</span>`;
+
+      let isCorrect = false;
+      if (q.type === "number") {
+        isCorrect = isCloseEnough(userAnswer, correct);
+      } else {
+        isCorrect = userAnswer === correct;
+      }
+
+      if (isCorrect) {
+        score++;
+        feedbackDiv.className = "feedback correct";
+        feedbackDiv.innerHTML = `${yourAnswerText} ✓`;
+      } else {
+        feedbackDiv.className = "feedback incorrect";
+        feedbackDiv.innerHTML = `${yourAnswerText} ✗<br>${correctAnswerText}`;
       }
     });
-
-    const percent = ((score / questions.length) * 100).toFixed(1);
-    document.getElementById("resultBox").innerText = `Score: ${score}/20 (${percent}%)`;
+    return score;
   }
+
+  function validateAnswers() {
+    for (let q of questions) {
+      if (q.type === "mcq") {
+        const radios = document.getElementsByName(`q${q.id}`);
+        let answered = false;
+        radios.forEach(radio => {
+          if (radio.checked) answered = true;
+        });
+        if (!answered) {
+          alert(`Please answer question ${q.id} before submitting.`);
+          return false;
+        }
+      } else {
+        const input = document.querySelector(`input[name="q${q.id}"]`);
+        if (!input.value.trim()) {
+          alert(`Please answer question ${q.id} before submitting.`);
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  function buildQuiz() {
+    questions.forEach(q => {
+      form.insertAdjacentHTML('beforeend', createQuestionHTML(q));
+    });
+    form.insertAdjacentHTML('beforeend', `<button type="submit" class="submit-btn">Submit Quiz</button>`);
+  }
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+
+    if (!validateAnswers()) return;
+
+    const score = showFeedback();
+    alert(`You scored ${score} out of ${questions.length}!`);
+
+    // Disable inputs after submit
+    form.querySelectorAll('input').forEach(input => input.disabled = true);
+    form.querySelector('.submit-btn').disabled = true;
+  });
+
+  buildQuiz();
 </script>
 
 </body>
