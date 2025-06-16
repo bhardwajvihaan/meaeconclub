@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>MEA Economics Club: Price Elasticity of Demand Quiz</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4f4f4; padding: 20px; }
+    h1 { color: #003366; }
+    .question { background: #fff; padding: 15px; margin-bottom: 15px; border-radius: 5px; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
+    .question p { margin: 0 0 10px; }
+    button { background: #003366; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; }
+    .result { margin-top: 20px; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+<h1>MEA Economics Club: Price Elasticity of Demand Quiz</h1>
+<p><strong>AP Microeconomics CED Topic:</strong> 2.3 – Price Elasticity of Demand</p>
+
+<form id="quizForm">
+  <!-- Questions will be inserted here by JavaScript -->
+</form>
+
+<button onclick="gradeQuiz()">Submit</button>
+<div class="result" id="resultBox"></div>
+
+<script>
+  const questions = [
+    {
+      type: 'mc',
+      question: "1. What does a price elasticity of demand (PED) greater than 1 indicate?",
+      options: ["Elastic", "Inelastic", "Unit elastic", "Perfectly inelastic"],
+      answer: "Elastic"
+    },
+    {
+      type: 'mc',
+      question: "2. If PED = 0, demand is:",
+      options: ["Perfectly inelastic", "Perfectly elastic", "Unit elastic", "Elastic"],
+      answer: "Perfectly inelastic"
+    },
+    {
+      type: 'mc',
+      question: "3. The midpoint formula is used to calculate:",
+      options: ["Cross-price elasticity", "Income elasticity", "Percentage change in demand", "Price elasticity over a range"],
+      answer: "Price elasticity over a range"
+    },
+    {
+      type: 'mc',
+      question: "4. If a good has many substitutes, its demand tends to be:",
+      options: ["Elastic", "Inelastic", "Perfectly inelastic", "Unit elastic"],
+      answer: "Elastic"
+    },
+    {
+      type: 'mc',
+      question: "5. What happens to total revenue when price rises and demand is inelastic?",
+      options: ["Increases", "Decreases", "Stays the same", "Becomes negative"],
+      answer: "Increases"
+    },
+    {
+      type: 'mc',
+      question: "6. If PED = 1, total revenue is:",
+      options: ["Maximized", "Minimized", "Decreasing", "Increasing"],
+      answer: "Maximized"
+    },
+    {
+      type: 'mc',
+      question: "7. What is the PED for a perfectly elastic good?",
+      options: ["0", "1", "Infinity", "Undefined"],
+      answer: "Infinity"
+    },
+    {
+      type: 'mc',
+      question: "8. Which of the following has likely inelastic demand?",
+      options: ["Salt", "Luxury cars", "Vacations", "Movie tickets"],
+      answer: "Salt"
+    },
+    {
+      type: 'mc',
+      question: "9. In the long run, demand is usually:",
+      options: ["More elastic", "More inelastic", "Perfectly elastic", "Constant"],
+      answer: "More elastic"
+    },
+    {
+      type: 'mc',
+      question: "10. If the PED is less than 1, total revenue will ______ when price increases.",
+      options: ["Increase", "Decrease", "Remain unchanged", "Fluctuate"],
+      answer: "Increase"
+    },
+    {
+      type: 'mc',
+      question: "11. PED can never be:",
+      options: ["Negative", "Positive", "Zero", "Infinity"],
+      answer: "Positive"
+    },
+    {
+      type: 'num',
+      question: "12. Price increases from $10 to $12. Quantity demanded falls from 100 to 80. What is the PED (2 decimal places)?",
+      answer: 0.91
+    },
+    {
+      type: 'num',
+      question: "13. Price drops from $50 to $40. Quantity demanded rises from 200 to 300. PED?",
+      answer: 2.20
+    },
+    {
+      type: 'num',
+      question: "14. Price rises 20%, and quantity demanded falls 10%. PED?",
+      answer: 0.50
+    },
+    {
+      type: 'num',
+      question: "15. Price falls 25%, and quantity demanded rises 75%. PED?",
+      answer: 3.00
+    },
+    {
+      type: 'num',
+      question: "16. Price increases from $30 to $33. Quantity demanded drops from 150 to 135. PED?",
+      answer: 1.00
+    },
+    {
+      type: 'num',
+      question: "17. Price increases 10%, and quantity demanded falls 15%. PED?",
+      answer: 1.50
+    },
+    {
+      type: 'num',
+      question: "18. Price drops 20%, and quantity rises 10%. PED?",
+      answer: 0.50
+    },
+    {
+      type: 'num',
+      question: "19. Price increases from $60 to $66. Quantity falls from 90 to 81. PED?",
+      answer: 1.00
+    },
+    {
+      type: 'num',
+      question: "20. Price drops from $80 to $72. Quantity increases from 50 to 65. PED?",
+      answer: 2.38
+    }
+  ];
+
+  // Render questions
+  const form = document.getElementById("quizForm");
+  questions.forEach((q, i) => {
+    const div = document.createElement("div");
+    div.className = "question";
+    div.innerHTML = `<p>${q.question}</p>`;
+    if (q.type === "mc") {
+      q.options.forEach(opt => {
+        div.innerHTML += `<label><input type="radio" name="q${i}" value="${opt}"> ${opt}</label><br>`;
+      });
+    } else {
+      div.innerHTML += `<input type="number" step="0.01" name="q${i}" placeholder="Enter PED value">`;
+    }
+    form.appendChild(div);
+  });
+
+  function gradeQuiz() {
+    let score = 0;
+    questions.forEach((q, i) => {
+      const inputName = "q" + i;
+      const inputs = document.getElementsByName(inputName);
+      let userAnswer = null;
+
+      if (q.type === "mc") {
+        for (let input of inputs) {
+          if (input.checked) {
+            userAnswer = input.value.trim();
+            break;
+          }
+        }
+        if (userAnswer === q.answer) score++;
+      } else {
+        const num = parseFloat(inputs[0].value);
+        if (!isNaN(num) && Math.abs(num - q.answer) <= 0.05) score++;
+      }
+    });
+
+    const percent = ((score / questions.length) * 100).toFixed(1);
+    document.getElementById("resultBox").innerText = `Score: ${score}/20 (${percent}%)`;
+  }
+</script>
+
+</body>
+</html>
