@@ -173,8 +173,8 @@
       });
 
       const resultDiv = document.getElementById("result");
-      resultDiv.innerHTML = `<p>Your score: ${score} / ${questions.length}</p>`;
-
+      resultDiv.innerHTML = `<p><strong>Your score: ${score} / ${questions.length}</strong></p>`;
+      
       results.forEach(r => {
         const p = document.createElement("p");
         p.innerHTML = `<strong>Q${r.number}:</strong> ${r.status}<br>
