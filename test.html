@@ -2,156 +2,158 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>MEA Economics Club - AP Micro 2.1–2.4 Quiz</title>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quiz with Detailed Report</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans&display=swap" rel="stylesheet" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <style>
     body {
       font-family: 'DM Sans', sans-serif;
-      background-color: #e0f2e9;
-      margin: 0;
-      padding: 2rem;
+      background-color: #e8f5e9;
+      margin: 20px;
     }
-
-    header {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: 2rem;
-      color: #2b3664;
-    }
-
-    .question {
+    .quiz-container {
       background: white;
-      padding: 1rem;
-      margin-bottom: 1rem;
+      padding: 20px;
       border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-
-    #progressBarContainer {
-      width: 100%;
-      background: #ddd;
-      border-radius: 8px;
-      margin-bottom: 1.5rem;
+    .question {
+      margin-bottom: 15px;
     }
-
-    #progressBar {
-      height: 20px;
-      background: #4caf50;
-      width: 0%;
-      border-radius: 8px;
+    .question h3 {
+      margin: 0 0 5px;
     }
-
-    .correct { color: green; }
-    .incorrect { color: red; }
+    .question input {
+      margin-right: 10px;
+    }
+    .quiz-report {
+      padding: 20px;
+      width: 800px;
+      background: #fff;
+      color: #000;
+    }
+    .question-block {
+      border-bottom: 1px solid #ccc;
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+    }
+    .correct {
+      color: green;
+      font-weight: bold;
+    }
+    .incorrect {
+      color: red;
+      font-weight: bold;
+    }
+    .explanation {
+      font-style: italic;
+      color: #555;
+    }
+    #downloadBtn {
+      margin-top: 20px;
+      padding: 10px 15px;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
-  <header>
-    <img src="MEA%20Economics%20Club%20Logo%20(original).png" alt="MEA Logo" width="150">
-    <h1>AP Microeconomics Quiz: Units 2.1–2.4</h1>
-  </header>
+  <div class="quiz-container">
+    <div id="quiz">
+      <!-- Example questions -->
+    </div>
+    <button onclick="submitQuiz()">Submit Quiz</button>
+  </div>
 
-  <form id="quizForm">
-    <div id="progressBarContainer"><div id="progressBar"></div></div>
-    <div id="quiz"></div>
-    <button type="submit">Submit Quiz</button>
-    <div id="result" class="result"></div>
-    <button id="downloadPdf" style="display:none; margin-top:20px;">Download Report as PDF</button>
-  </form>
+  <div id="quizReport" class="quiz-report" style="display:none;"></div>
+  <button onclick="generatePDF()" style="display:none;" id="downloadBtn">Download Quiz Report</button>
 
   <script>
-    const { jsPDF } = window.jspdf;
-
     const questions = [
-      { q: "Which shifts demand for smartphones right?", options:["An increase in price","A rise in consumer income (normal good)","An increase in production costs","Higher interest rates"], correct:"A rise in consumer income (normal good)", explanation: "Higher income increases demand for normal goods." },
-      { q: "Which causes leftward shift of wheat supply?", options:["Improved technology","Government subsidy","Drought","Lower production taxes"], correct:"Drought", explanation: "Drought reduces production capacity, decreasing supply." },
-      { q: "PED can never be:", options:["Negative","Positive","Zero","Infinity"], correct:"Positive", explanation: "PED is negative due to inverse price–quantity relationship." },
-      { q: "If Qd 60→75 as price falls $10→$8, PED?", type:"number", correct:"1.25", explanation: "PED = (%ΔQd)/(%)ΔP = (25%)/(–20%) = |–1.25| = 1.25." },
-      { q: "Which good likely has elastic demand?", options:["Salt","Electricity","Luxury watches","Gasoline"], correct:"Luxury watches", explanation: "Luxury goods have many substitutes; demand is more elastic." }
+      {
+        question: "What is the law of demand?",
+        options: ["As price increases, demand increases", "As price increases, demand decreases", "As price decreases, demand decreases", "Demand and price are unrelated"],
+        correctIndex: 1,
+        explanation: "Law of demand states that as price increases, quantity demanded decreases."
+      },
+      {
+        question: "What is price elasticity of demand?",
+        options: ["A measure of price", "How demand responds to price change", "How supply responds to price change", "None of the above"],
+        correctIndex: 1,
+        explanation: "Elasticity shows how sensitive quantity demanded is to price change."
+      }
     ];
 
-    const quizDiv = document.getElementById("quiz");
-    const progressBar = document.getElementById("progressBar");
-    const downloadPdfBtn = document.getElementById("downloadPdf");
+    let userAnswers = [];
 
-    // Render questions
-    questions.forEach((q, i) => {
-      const wrapper = document.createElement("div");
-      wrapper.className = "question";
-      let html = `<p><strong>${i+1}. ${q.q}</strong></p>`;
-      if (q.options) {
-        q.options.forEach(opt => {
-          html += `<label><input type="radio" name="q${i}" value="${opt}"> ${opt}</label><br>`;
-        });
-      } else if (q.type === "number") {
-        html += `<input type="number" name="q${i}" step="any">`;
-      }
-      wrapper.innerHTML = html;
-      quizDiv.appendChild(wrapper);
-    });
-
-    // Progress bar logic
-    quizDiv.addEventListener("input", () => {
-      const answered = Array.from(document.querySelectorAll("input"))
-        .filter(i => (i.type === "radio" && i.checked) || (i.type === "number" && i.value !== "")).length;
-      progressBar.style.width = Math.round(answered / questions.length * 100) + "%";
-    });
-
-    // On submit
-    document.getElementById("quizForm").addEventListener("submit", e => {
-      e.preventDefault();
-      let score = 0;
-      const results = [];
-
+    function loadQuiz() {
+      const quizDiv = document.getElementById("quiz");
       questions.forEach((q, i) => {
-        const input = document.querySelector(`input[name="q${i}"]${q.options ? ":checked" : ""}`);
-        const userAns = input ? input.value.trim() : document.querySelector(`input[name="q${i}"]`).value.trim();
-        const isCorrect = userAns.toLowerCase() === q.correct.toString().toLowerCase();
-        if (isCorrect) score++;
-        results.push({ number: i+1, question: q.q, selected: userAns, correctAns: q.correct, correct: isCorrect, explanation: q.explanation });
+        const div = document.createElement("div");
+        div.classList.add("question");
+        div.innerHTML = `<h3>${i + 1}. ${q.question}</h3>` +
+          q.options.map((opt, j) => `
+            <label><input type="radio" name="q${i}" value="${j}"> ${opt}</label><br>
+          `).join("");
+        quizDiv.appendChild(div);
+      });
+    }
+
+    function submitQuiz() {
+      userAnswers = [];
+      questions.forEach((q, i) => {
+        const selected = document.querySelector(`input[name=q${i}]:checked`);
+        userAnswers.push(selected ? parseInt(selected.value) : null);
       });
 
-      const resultDiv = document.getElementById("result");
-      resultDiv.innerHTML = `<h3>Your Score: ${score}/${questions.length}</h3>`;
-      results.forEach(r => {
-        resultDiv.innerHTML += `
-          <p><strong>Q${r.number}:</strong> ${r.correct ? '<span class="correct">Correct</span>' : '<span class="incorrect">Incorrect</span>'}<br>
-          Your answer: <span class="${r.correct ? 'correct' : 'incorrect'}">${r.selected}</span><br>
-          Correct answer: <span class="correct">${r.correctAns}</span><br>
-          ${!r.correct ? `<em>Explanation:</em> ${r.explanation}` : ''}</p>`;
-      });
+      generateReport();
+      document.getElementById("quizReport").style.display = "block";
+      document.getElementById("downloadBtn").style.display = "inline-block";
+    }
 
-      downloadPdfBtn.style.display = 'block';
-      downloadPdfBtn.onclick = () => {
-        const doc = new jsPDF();
-        doc.setFontSize(12);
-        doc.text(`Score: ${score}/${questions.length}`, 10, 10);
-        let y = 20;
-        results.forEach(r => {
-          doc.setTextColor(0);
-          doc.text(`${r.number}. ${r.question}`, 10, y); y += 6;
-          if (!r.correct) {
-            doc.setTextColor(255, 0, 0);
-            doc.text(`Your: ${r.selected}`, 10, y); y += 6;
-            doc.setTextColor(0, 128, 0);
-            doc.text(`Correct: ${r.correctAns}`, 10, y); y += 6;
-            doc.setTextColor(0);
-            doc.text(`Explanation: ${r.explanation}`, 10, y); y += 8;
-          } else {
-            doc.setTextColor(0, 128, 0);
-            doc.text(`Correct`, 10, y); y += 8;
-          }
-          if (y > 270) { doc.addPage(); y = 20; }
-        });
-        doc.save("quiz_report.pdf");
-      };
-    });
+    function generateReport() {
+      const container = document.getElementById("quizReport");
+      container.innerHTML = "<h2>Quiz Report</h2>";
+      questions.forEach((q, i) => {
+        const userIndex = userAnswers[i];
+        const correctIndex = q.correctIndex;
+        const isCorrect = userIndex === correctIndex;
+        const userAns = userIndex !== null ? q.options[userIndex] : "No answer selected";
+
+        container.innerHTML += `
+          <div class="question-block">
+            <div><strong>Q${i + 1}: ${q.question}</strong></div>
+            <div class="${isCorrect ? 'correct' : 'incorrect'}">
+              Your answer: ${userAns}
+            </div>
+            ${!isCorrect ? `<div class="correct">Correct answer: ${q.options[correctIndex]}</div>
+            <div class="explanation">Explanation: ${q.explanation}</div>` : ''}
+          </div>
+        `;
+      });
+    }
+
+    async function generatePDF() {
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF("p", "pt", "a4");
+      const report = document.getElementById("quizReport");
+
+      await html2canvas(report, { scale: 2 }).then(canvas => {
+        const imgData = canvas.toDataURL("image/png");
+        const imgProps = pdf.getImageProperties(imgData);
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+        pdf.addImage(imgData, "PNG", 20, 20, pdfWidth - 40, pdfHeight);
+        pdf.save("quiz-report.pdf");
+      });
+    }
+
+    loadQuiz();
   </script>
 </body>
 </html>
