@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MEA Economics Club - Price Elasticity of Supply Quiz (AP Micro 2.4)</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #f4f9ff;
+      padding: 2rem;
+      color: #222;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .header img {
+      max-width: 100px;
+      display: block;
+      margin: 0 auto 1rem;
+    }
+
+    .header h1 {
+      font-size: 2.2rem;
+      margin: 0;
+      color: #1a4d8f;
+    }
+
+    .header h2 {
+      font-size: 1.2rem;
+      font-weight: normal;
+      margin-top: 0.3rem;
+      color: #444;
+    }
+
+    form {
+      max-width: 850px;
+      margin: auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .question {
+      margin-bottom: 1.8rem;
+    }
+
+    .question p {
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.3rem;
+    }
+
+    input[type="number"] {
+      padding: 0.4rem;
+      width: 120px;
+      font-size: 1rem;
+    }
+
+    button {
+      background-color: #1a4d8f;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 1rem;
+    }
+
+    button:hover {
+      background-color: #163f75;
+    }
+
+    .result {
+      margin-top: 2rem;
+      font-weight: bold;
+    }
+
+    .correct {
+      color: green;
+    }
+
+    .incorrect {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <img src="https://raw.githubusercontent.com/yourusername/yourrepo/main/MEA%20Economics%20Club%20Logo%20(original).png" alt="MEA Economics Club Logo">
+    <h1>MEA Economics Club</h1>
+    <h2>AP Micro 2.4: Price Elasticity of Supply Quiz</h2>
+  </div>
+
+  <form id="quizForm">
+    <div id="quiz"></div>
+    <button type="submit">Submit Quiz</button>
+    <div id="result" class="result"></div>
+  </form>
+
+  <script>
+    const questions = [
+      { q: "1. If the percentage change in quantity supplied is greater than the percentage change in price, supply is:", options: ["Inelastic", "Elastic", "Unit elastic", "Perfectly inelastic"], correct: "Elastic" },
+      { q: "2. PES measures:", options: ["Producer efficiency", "Willingness to pay", "Responsiveness of quantity supplied to price", "Cost of production"], correct: "Responsiveness of quantity supplied to price" },
+      { q: "3. A vertical supply curve indicates:", options: ["Unit elasticity", "Elastic supply", "Inelastic supply", "Perfectly inelastic supply"], correct: "Perfectly inelastic supply" },
+      { q: "4. If PES = 1.5, then:", options: ["Supply is inelastic", "Supply is elastic", "Supply is unit elastic", "Supply is perfectly elastic"], correct: "Supply is elastic" },
+      { q: "5. Which of these factors most affects PES in the short run?", options: ["Number of consumers", "Stock availability", "Marketing budget", "Advertising"], correct: "Stock availability" },
+      { q: "6. In the long run, supply is generally:", options: ["More inelastic", "Perfectly elastic", "More elastic", "Unchanged"], correct: "More elastic" },
+      { q: "7. PES is calculated as:", options: ["%ΔQd / %ΔP", "%ΔQs / %ΔP", "%ΔP / %ΔQs", "%ΔQs - %ΔP"], correct: "%ΔQs / %ΔP" },
+      { q: "8. If the quantity supplied changes from 100 to 130 due to a price increase from $10 to $13, what is PES?", type: "number", correct: "1" },
+      { q: "9. Which good is likely to have inelastic supply?", options: ["Bananas", "Handmade art", "T-shirts", "Notebooks"], correct: "Handmade art" },
+      { q: "10. PES = 0 implies:", options: ["Supply is responsive to price", "Supply is perfectly elastic", "Quantity supplied doesn't change with price", "Producers are irrational"], correct: "Quantity supplied doesn't change with price" },
+      { q: "11. Which of the following will likely increase PES?", options: ["Higher fixed costs", "Better technology", "Limited raw materials", "No excess capacity"], correct: "Better technology" },
+      { q: "12. If a firm has lots of unused capacity, its PES is likely to be:", options: ["Low", "High", "Zero", "Negative"], correct: "High" }
+    ];
+
+    const quizDiv = document.getElementById("quiz");
+
+    questions.forEach((q, i) => {
+      const qDiv = document.createElement("div");
+      qDiv.className = "question";
+
+      const qText = document.createElement("p");
+      qText.textContent = q.q;
+      qDiv.appendChild(qText);
+
+      if (q.options) {
+        q.options.forEach(opt => {
+          const label = document.createElement("label");
+          const input = document.createElement("input");
+          input.type = "radio";
+          input.name = `q${i}`;
+          input.value = opt;
+          input.required = true;
+          label.appendChild(input);
+          label.append(` ${opt}`);
+          qDiv.appendChild(label);
+        });
+      } else if (q.type === "number") {
+        const input = document.createElement("input");
+        input.type = "number";
+        input.name = `q${i}`;
+        input.step = "any";
+        input.required = true;
+        qDiv.appendChild(input);
+      }
+
+      quizDiv.appendChild(qDiv);
+    });
+
+    document.getElementById("quizForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      let score = 0;
+      const results = [];
+
+      questions.forEach((q, i) => {
+        const formElement = document.forms["quizForm"];
+        const userAnswer = formElement[`q${i}`].value;
+        const isCorrect = userAnswer.toString().toLowerCase() === q.correct.toString().toLowerCase();
+        if (isCorrect) score++;
+        results.push({
+          number: i + 1,
+          question: q.q,
+          selected: userAnswer,
+          correct: q.correct,
+          status: isCorrect ? "Correct" : "Incorrect"
+        });
+      });
+
+      const resultDiv = document.getElementById("result");
+      resultDiv.innerHTML = `<p>Your score: ${score} / ${questions.length}</p>`;
+
+      results.forEach(r => {
+        const p = document.createElement("p");
+        p.innerHTML = `<strong>Q${r.number}:</strong> ${r.status}<br>
+          Your answer: <span class="${r.status === "Correct" ? 'correct' : 'incorrect'}">${r.selected}</span><br>
+          Correct answer: <span class="correct">${r.correct}</span><br>`;
+        resultDiv.appendChild(p);
+      });
+    });
+  </script>
+</body>
+</html>
