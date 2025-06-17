@@ -2,182 +2,154 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>MEA Economics Club - AP Micro 2.1–2.4 Quiz</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     body {
       font-family: 'DM Sans', sans-serif;
-      background-color: #e6f0ec;
+      background-color: #e0f2e9;
       margin: 0;
       padding: 2rem;
-      color: #333;
     }
+
     header {
       text-align: center;
       margin-bottom: 2rem;
     }
-    header img {
-      max-width: 120px;
-    }
+
     h1 {
-      font-size: 1.8rem;
-      margin: 0.5rem 0;
+      margin: 0;
+      font-size: 2rem;
+      color: #2b3664;
     }
+
     .question {
       background: white;
       padding: 1rem;
       margin-bottom: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    #progressBarContainer {
+      width: 100%;
+      background: #ddd;
       border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 1.5rem;
     }
-    button {
-      padding: 0.6rem 1.2rem;
-      font-size: 1rem;
-      border: none;
-      border-radius: 6px;
-      background-color: #1e5f4f;
-      color: white;
-      cursor: pointer;
-      margin-top: 1rem;
-    }
-    button:hover {
-      background-color: #164c3e;
-    }
-    .result {
-      margin-top: 2rem;
-      padding: 1rem;
-      background: #fff;
+
+    #progressBar {
+      height: 20px;
+      background: #4caf50;
+      width: 0%;
       border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
-    .correct {
-      color: green;
-      font-weight: bold;
-    }
-    .incorrect {
-      color: red;
-      font-weight: bold;
-    }
-    input[type="number"] {
-      padding: 0.3rem;
-      font-size: 1rem;
-      width: 100px;
-    }
-    label {
-      display: block;
-      margin-bottom: 0.3rem;
-    }
+
+    .correct { color: green; }
+    .incorrect { color: red; }
   </style>
 </head>
 <body>
   <header>
-    <img src="MEA%20Economics%20Club%20Logo%20(original).png" alt="MEA Logo">
+    <img src="MEA%20Economics%20Club%20Logo%20(original).png" alt="MEA Logo" width="150">
     <h1>AP Microeconomics Quiz: Units 2.1–2.4</h1>
   </header>
 
   <form id="quizForm">
+    <div id="progressBarContainer"><div id="progressBar"></div></div>
     <div id="quiz"></div>
     <button type="submit">Submit Quiz</button>
     <div id="result" class="result"></div>
-    <button id="downloadPdf" style="display:none;">Download Report as PDF</button>
+    <button id="downloadPdf" style="display:none; margin-top:20px;">Download Report as PDF</button>
   </form>
 
   <script>
     const { jsPDF } = window.jspdf;
+
+    const questions = [
+      { q: "Which shifts demand for smartphones right?", options:["An increase in price","A rise in consumer income (normal good)","An increase in production costs","Higher interest rates"], correct:"A rise in consumer income (normal good)", explanation: "Higher income increases demand for normal goods." },
+      { q: "Which causes leftward shift of wheat supply?", options:["Improved technology","Government subsidy","Drought","Lower production taxes"], correct:"Drought", explanation: "Drought reduces production capacity, decreasing supply." },
+      { q: "PED can never be:", options:["Negative","Positive","Zero","Infinity"], correct:"Positive", explanation: "PED is negative due to inverse price–quantity relationship." },
+      { q: "If Qd 60→75 as price falls $10→$8, PED?", type:"number", correct:"1.25", explanation: "PED = (%ΔQd)/(%)ΔP = (25%)/(–20%) = |–1.25| = 1.25." },
+      { q: "Which good likely has elastic demand?", options:["Salt","Electricity","Luxury watches","Gasoline"], correct:"Luxury watches", explanation: "Luxury goods have many substitutes; demand is more elastic." }
+    ];
+
     const quizDiv = document.getElementById("quiz");
+    const progressBar = document.getElementById("progressBar");
     const downloadPdfBtn = document.getElementById("downloadPdf");
 
-    const questions = [/* your 25 questions as already included, no changes */];
-
+    // Render questions
     questions.forEach((q, i) => {
-      const d = document.createElement("div");
-      d.className = "question";
+      const wrapper = document.createElement("div");
+      wrapper.className = "question";
       let html = `<p><strong>${i+1}. ${q.q}</strong></p>`;
       if (q.options) {
         q.options.forEach(opt => {
-          html += `<label><input type="radio" name="q${i}" value="${opt}" required> ${opt}</label>`;
+          html += `<label><input type="radio" name="q${i}" value="${opt}"> ${opt}</label><br>`;
         });
       } else if (q.type === "number") {
-        html += `<input type="number" name="q${i}" step="any" required>`;
+        html += `<input type="number" name="q${i}" step="any">`;
       }
-      d.innerHTML = html;
-      quizDiv.appendChild(d);
+      wrapper.innerHTML = html;
+      quizDiv.appendChild(wrapper);
     });
 
+    // Progress bar logic
+    quizDiv.addEventListener("input", () => {
+      const answered = Array.from(document.querySelectorAll("input"))
+        .filter(i => (i.type === "radio" && i.checked) || (i.type === "number" && i.value !== "")).length;
+      progressBar.style.width = Math.round(answered / questions.length * 100) + "%";
+    });
+
+    // On submit
     document.getElementById("quizForm").addEventListener("submit", e => {
       e.preventDefault();
       let score = 0;
       const results = [];
-      const missedTopics = new Set();
 
       questions.forEach((q, i) => {
-        const ua = document.forms.quizForm[`q${i}`].value;
-        const correct = ua.trim().toLowerCase() === q.correct.toString().trim().toLowerCase();
-        if (correct) score++;
-        else missedTopics.add(q.q.split(" ")[0]); // crude but useful topic marker
-        results.push({
-          number: i + 1,
-          question: q.q,
-          selected: ua,
-          correctAns: q.correct,
-          correct,
-          explanation: q.explanation
-        });
+        const input = document.querySelector(`input[name="q${i}"]${q.options ? ":checked" : ""}`);
+        const userAns = input ? input.value.trim() : document.querySelector(`input[name="q${i}"]`).value.trim();
+        const isCorrect = userAns.toLowerCase() === q.correct.toString().toLowerCase();
+        if (isCorrect) score++;
+        results.push({ number: i+1, question: q.q, selected: userAns, correctAns: q.correct, correct: isCorrect, explanation: q.explanation });
       });
 
-      const rd = document.getElementById("result");
-      rd.innerHTML = `<p><strong>Your score:</strong> ${score} / ${questions.length}</p>`;
+      const resultDiv = document.getElementById("result");
+      resultDiv.innerHTML = `<h3>Your Score: ${score}/${questions.length}</h3>`;
       results.forEach(r => {
-        rd.innerHTML += `
-        <p><strong>Q${r.number}:</strong> ${r.correct ? '<span class="correct">Correct</span>' : '<span class="incorrect">Incorrect</span>'}<br>
-        Your answer: <span class="${r.correct ? 'correct' : 'incorrect'}">${r.selected}</span><br>
-        Correct answer: <span class="correct">${r.correctAns}</span><br>
-        ${!r.correct ? `<em>Explanation:</em> ${r.explanation}` : ''}</p>`;
+        resultDiv.innerHTML += `
+          <p><strong>Q${r.number}:</strong> ${r.correct ? '<span class="correct">Correct</span>' : '<span class="incorrect">Incorrect</span>'}<br>
+          Your answer: <span class="${r.correct ? 'correct' : 'incorrect'}">${r.selected}</span><br>
+          Correct answer: <span class="correct">${r.correctAns}</span><br>
+          ${!r.correct ? `<em>Explanation:</em> ${r.explanation}` : ''}</p>`;
       });
 
-      downloadPdfBtn.style.display = 'inline-block';
-
+      downloadPdfBtn.style.display = 'block';
       downloadPdfBtn.onclick = () => {
         const doc = new jsPDF();
-        doc.setFont("helvetica");
-        doc.setFontSize(14);
-        doc.text(`MEA AP Micro 2.1–2.4 Quiz Report`, 10, 15);
         doc.setFontSize(12);
-        doc.text(`Score: ${score} / ${questions.length}`, 10, 25);
-
-        if (missedTopics.size > 0) {
-          doc.setTextColor(200, 0, 0);
-          doc.text("Recommended Areas to Review:", 10, 35);
-          let y = 42;
-          missedTopics.forEach(topic => {
-            doc.text(`- ${topic}`, 12, y);
-            y += 7;
-          });
-          doc.setTextColor(0, 0, 0);
-        }
-
-        let y = 60;
+        doc.text(`Score: ${score}/${questions.length}`, 10, 10);
+        let y = 20;
         results.forEach(r => {
-          if (y > 270) { doc.addPage(); y = 20; }
-          doc.setFontSize(12);
-          doc.setTextColor(0, 0, 0);
-          doc.text(`${r.number}. ${r.question}`, 10, y); y += 7;
+          doc.setTextColor(0);
+          doc.text(`${r.number}. ${r.question}`, 10, y); y += 6;
           if (!r.correct) {
             doc.setTextColor(255, 0, 0);
-            doc.text(`Your answer: ${r.selected}`, 10, y); y += 7;
+            doc.text(`Your: ${r.selected}`, 10, y); y += 6;
             doc.setTextColor(0, 128, 0);
-            doc.text(`Correct answer: ${r.correctAns}`, 10, y); y += 7;
-            doc.setTextColor(0, 0, 0);
-            doc.text(`Explanation: ${r.explanation}`, 10, y); y += 10;
+            doc.text(`Correct: ${r.correctAns}`, 10, y); y += 6;
+            doc.setTextColor(0);
+            doc.text(`Explanation: ${r.explanation}`, 10, y); y += 8;
           } else {
             doc.setTextColor(0, 128, 0);
-            doc.text(`Correct`, 10, y); y += 10;
+            doc.text(`Correct`, 10, y); y += 8;
           }
+          if (y > 270) { doc.addPage(); y = 20; }
         });
-
-        doc.save("AP_Micro_Quiz_Report.pdf");
+        doc.save("quiz_report.pdf");
       };
     });
   </script>
