@@ -1,16 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>MEA Economics Club - AP Micro 2.1–2.4 Quiz</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AP Microeconomics Quiz</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     body {
       font-family: 'DM Sans', sans-serif;
-      background-color: #BCD2C6;
-      margin: 0;
+      background: #BCD2C6;
       padding: 2rem;
       color: #333;
     }
@@ -18,18 +17,9 @@
       text-align: center;
       margin-bottom: 2rem;
     }
-    header img {
-      height: 80px;
-      margin-bottom: 1rem;
-    }
     h1 {
       font-size: 2rem;
       margin: 0.2rem;
-    }
-    h2 {
-      font-weight: normal;
-      font-size: 1.2rem;
-      color: #555;
     }
     form {
       max-width: 900px;
@@ -41,26 +31,26 @@
     }
     .question {
       margin-bottom: 1.5rem;
-      padding: 1rem;
-      border-radius: 8px;
-    }
-    .missed {
-      background-color: #ffe6e6;
-      border: 1px solid #ff6666;
     }
     .question p {
       font-weight: bold;
-      margin-bottom: 0.5rem;
     }
     .result {
       margin-top: 2rem;
       font-weight: bold;
     }
-    .correct { color: green; }
-    .incorrect { color: red; }
+    .correct {
+      color: green;
+    }
+    .incorrect {
+      color: red;
+      background-color: #f8d7da;
+      padding: 0.2rem;
+      border-radius: 4px;
+    }
     button {
       display: block;
-      margin: 1rem auto;
+      margin: auto;
       background-color: #4caf50;
       color: white;
       padding: 0.7rem 1.5rem;
@@ -72,47 +62,71 @@
     button:hover {
       background-color: #F194A0;
     }
-    #progressBarContainer {
-      width: 100%;
-      background-color: #ccc;
-      border-radius: 10px;
-      margin: 20px auto;
-      height: 20px;
-    }
     #progressBar {
-      height: 100%;
-      background-color: #4caf50;
+      width: 100%;
+      background-color: #ddd;
+      border-radius: 12px;
+      margin-bottom: 20px;
+    }
+    #progressBarFill {
+      height: 20px;
       width: 0%;
-      border-radius: 10px;
+      background-color: #4caf50;
+      border-radius: 12px;
       transition: width 0.3s;
     }
   </style>
 </head>
 <body>
   <header>
-    <img src="MEA%20Economics%20Club%20Logo%20(original).png" alt="MEA Economics Club Logo">
-    <h1>AP Microeconomics Quiz: Demand, Supply, and Elasticities (Units 2.1–2.4)</h1>
+    <h1>AP Microeconomics Quiz: Demand, Supply & Elasticities</h1>
   </header>
 
-  <div id="progressBarContainer"><div id="progressBar"></div></div>
+  <div id="progressBar">
+    <div id="progressBarFill"></div>
+  </div>
 
   <form id="quizForm">
     <div id="quiz"></div>
     <button type="submit">Submit Quiz</button>
     <div id="result" class="result"></div>
-    <button id="downloadBtn" style="display:none;">Download PDF Report</button>
+    <button onclick="downloadPDF()" type="button">Download PDF Report</button>
   </form>
 
   <script>
-    const { jsPDF } = window.jspdf;
-    const questions = [/* insert 25 question objects from previous version here */];
+      const questions = [
+      { q: "1. Which of the following shifts the demand curve for smartphones to the right?", options: ["An increase in price", "A rise in consumer income (normal good)", "An increase in production costs", "Higher interest rates"], correct: "A rise in consumer income (normal good)", concept: "Demand" },
+      { q: "2. Which of these would cause a leftward shift of the supply curve for wheat?", options: ["Improved technology", "Government subsidy", "Drought", "Lower production taxes"], correct: "Drought", concept: "Supply" },
+      { q: "3. PED can never be:", options: ["Negative", "Positive", "Zero", "Infinity"], correct: "Positive", concept: "PED" },
+      { q: "4. If Qd increases from 60 to 75 as price falls from $10 to $8, what is PED?", type: "number", correct: "1.25", concept: "PED" },
+      { q: "5. Which good is most likely to have elastic demand?", options: ["Salt", "Electricity", "Luxury watches", "Gasoline"], correct: "Luxury watches", concept: "PED" },
+      { q: "6. A price ceiling leads to:", options: ["Surplus", "Shortage", "Equilibrium", "Higher prices"], correct: "Shortage", concept: "Demand and Supply" },
+      { q: "7. If PES = 0.8, supply is:", options: ["Elastic", "Perfectly elastic", "Inelastic", "Unit elastic"], correct: "Inelastic", concept: "PES" },
+      { q: "8. A decrease in input costs affects the supply curve by:", options: ["Shifting it left", "Making it steeper", "Shifting it right", "No effect"], correct: "Shifting it right", concept: "Supply" },
+      { q: "9. What is PES if price rises from $20 to $25 and Qs increases from 100 to 120?", type: "number", correct: "1", concept: "PES" },
+      { q: "10. When demand is inelastic and price rises, total revenue:", options: ["Increases", "Decreases", "Stays the same", "Becomes zero"], correct: "Increases", concept: "PED" },
+      { q: "11. What is the formula for PED?", options: ["%ΔP / %ΔQd", "%ΔQd / %ΔP", "%ΔQd × %ΔP", "%ΔQd - %ΔP"], correct: "%ΔQd / %ΔP", concept: "PED" },
+      { q: "12. If a 20% price increase causes a 40% drop in quantity demanded, PED is:", type: "number", correct: "2", concept: "PED" },
+      { q: "13. A product with perfectly elastic supply has a curve that is:", options: ["Vertical", "Horizontal", "Upward sloping", "U-shaped"], correct: "Horizontal", concept: "PES" },
+      { q: "14. A decrease in consumer income affects which part of the model?", options: ["Supply", "Demand", "Equilibrium", "Price floor"], correct: "Demand", concept: "Demand" },
+      { q: "15. If price drops 10% and Qd rises 15%, PED is:", type: "number", correct: "1.5", concept: "PED" },
+      { q: "16. When PES > 1, supply is:", options: ["Elastic", "Inelastic", "Unit elastic", "Perfectly inelastic"], correct: "Elastic", concept: "PES" },
+      { q: "17. A rightward shift in demand leads to:", options: ["Lower price", "Lower quantity", "Higher equilibrium price", "Surplus"], correct: "Higher equilibrium price", concept: "Demand" },
+      { q: "18. What is PES if Qs increases 50% due to a 25% price rise?", type: "number", correct: "2", concept: "PES" },
+      { q: "19. Which factor makes supply more elastic?", options: ["Longer time period", "Few substitutes", "High necessity", "Inelastic demand"], correct: "Longer time period", concept: "PES" },
+      { q: "20. PED of zero implies:", options: ["Perfectly elastic", "Unit elastic", "Perfectly inelastic", "Elastic"], correct: "Perfectly inelastic", concept: "PED" },
+      { q: "21. Which market type is most likely to show inelastic demand?", options: ["Luxury cars", "Insulin", "Jewelry", "Entertainment"], correct: "Insulin", concept: "PED" },
+      { q: "22. If a subsidy is provided to producers, the supply curve:", options: ["Shifts left", "Shifts right", "Becomes vertical", "Does not change"], correct: "Shifts right", concept: "Supply" },
+      { q: "23. If Qd falls from 200 to 180 and price rises from $10 to $11, PED is:", type: "number", correct: "1", concept: "PED" },
+      { q: "24. What happens when supply is inelastic and demand increases?", options: ["Large quantity increase", "No price change", "Small quantity change, large price rise", "Equilibrium unchanged"], correct: "Small quantity change, large price rise", concept: "PES" },
+      { q: "25. Which determinant does NOT affect demand?", options: ["Income", "Tastes", "Input prices", "Price of substitutes"], correct: "Input prices", concept: "Demand" }
+    ];
 
     const quizDiv = document.getElementById("quiz");
 
     questions.forEach((q, i) => {
       const qDiv = document.createElement("div");
       qDiv.className = "question";
-      qDiv.id = `qbox-${i}`;
 
       const qText = document.createElement("p");
       qText.textContent = q.q;
@@ -125,92 +139,113 @@
           input.type = "radio";
           input.name = `q${i}`;
           input.value = opt;
-          input.required = true;
-          input.addEventListener("change", updateProgress);
           label.appendChild(input);
           label.append(` ${opt}`);
           qDiv.appendChild(label);
           qDiv.appendChild(document.createElement("br"));
         });
-      } else {
+      } else if (q.type === "number") {
         const input = document.createElement("input");
         input.type = "number";
         input.name = `q${i}`;
         input.step = "any";
-        input.required = true;
-        input.addEventListener("input", updateProgress);
         qDiv.appendChild(input);
       }
 
       quizDiv.appendChild(qDiv);
     });
 
-    function updateProgress() {
-      const total = questions.length;
-      let filled = 0;
-      for (let i = 0; i < total; i++) {
-        const el = document.forms["quizForm"][`q${i}`];
-        if (el.length) {
-          for (const opt of el) if (opt.checked) filled++;
-        } else if (el.value.trim() !== "") filled++;
-      }
-      const percentage = (filled / total) * 100;
-      document.getElementById("progressBar").style.width = percentage + "%";
-    }
+    const updateProgress = () => {
+      const answered = [...document.querySelectorAll("input:checked, input[type='number']")].filter(i => i.value).length;
+      const fill = document.getElementById("progressBarFill");
+      fill.style.width = `${(answered / questions.length) * 100}%`;
+    };
+
+    document.querySelectorAll("input").forEach(input => input.addEventListener("change", updateProgress));
 
     document.getElementById("quizForm").addEventListener("submit", function(e) {
       e.preventDefault();
       let score = 0;
+      const results = [];
       const weaknesses = {};
-      const report = [];
 
       questions.forEach((q, i) => {
-        const input = document.forms["quizForm"][`q${i}`];
-        const value = input.length ? [...input].find(r => r.checked)?.value : input.value;
-        const correctVal = parseFloat(q.correct);
-        const userVal = parseFloat(value);
-        const isCorrect = !isNaN(correctVal) && !isNaN(userVal) ? Math.abs(correctVal - userVal) < 0.01 : value?.toLowerCase() === q.correct.toLowerCase();
+        const inputEls = document.getElementsByName(`q${i}`);
+        let userAnswer = "";
+        inputEls.forEach(el => {
+          if (el.checked || el.type === "number") {
+            userAnswer = el.value;
+            el.disabled = true;
+          }
+        });
 
-        if (isCorrect) score++;
-        else {
+        const isCorrect = userAnswer.toString().toLowerCase() === q.correct.toString().toLowerCase();
+        if (!isCorrect) {
           weaknesses[q.concept] = (weaknesses[q.concept] || 0) + 1;
-          document.getElementById(`qbox-${i}`).classList.add("missed");
+        } else {
+          score++;
         }
 
-        if (input.length) for (const inp of input) inp.disabled = true;
-        else input.disabled = true;
+        const qDiv = inputEls[0]?.closest(".question");
+        if (qDiv) {
+          qDiv.classList.add(isCorrect ? "correct" : "incorrect");
+        }
 
-        report.push(`Q${i+1}: ${q.q}\nAnswer: ${value || "None"}\nCorrect: ${q.correct}\nStatus: ${isCorrect ? "Correct" : "Incorrect"}\n`);
+        results.push({
+          number: i + 1,
+          question: q.q,
+          selected: userAnswer,
+          correct: q.correct,
+          status: isCorrect ? "Correct" : "Incorrect"
+        });
       });
 
       const resultDiv = document.getElementById("result");
       resultDiv.innerHTML = `<p>Your score: ${score} / ${questions.length}</p>`;
-      const weakAreas = Object.keys(weaknesses);
-      if (weakAreas.length) {
-        resultDiv.innerHTML += `<h3>Recommended Topics to Review:</h3><ul>${weakAreas.map(concept => `<li>${concept} (${weaknesses[concept]} missed)</li>`).join('')}</ul>`;
+
+      const weakAreas = Object.keys(weaknesses).sort((a, b) => weaknesses[b] - weaknesses[a]);
+      if (weakAreas.length > 0) {
+        const advice = document.createElement("div");
+        advice.innerHTML = `<h3>Review These Topics:</h3><ul>${weakAreas.map(concept => `<li>${concept} (missed ${weaknesses[concept]} time${weaknesses[concept] > 1 ? 's' : ''})</li>`).join('')}</ul>`;
+        resultDiv.appendChild(advice);
       }
 
-      document.querySelector("button[type='submit']").disabled = true;
-      document.getElementById("downloadBtn").style.display = "block";
-
-      document.getElementById("downloadBtn").onclick = () => {
-        const pdf = new jsPDF();
-        pdf.setFontSize(12);
-        pdf.text(`AP Microeconomics Quiz Report\nScore: ${score}/${questions.length}\n`, 10, 10);
-        let y = 20;
-        report.forEach(r => {
-          const lines = pdf.splitTextToSize(r, 180);
-          pdf.text(lines, 10, y);
-          y += lines.length * 6;
-        });
-        if (weakAreas.length) {
-          pdf.text("\nRecommended Review Topics:", 10, y);
-          y += 10;
-          weakAreas.forEach(w => pdf.text(`- ${w}`, 10, y += 6));
-        }
-        pdf.save("quiz_report.pdf");
-      }
+      window.quizResults = { score, results, weaknesses };
     });
+
+    function downloadPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      const { score, results, weaknesses } = window.quizResults;
+
+      doc.text(`Quiz Report`, 10, 10);
+      doc.text(`Score: ${score} / ${questions.length}`, 10, 20);
+
+      let y = 30;
+      results.forEach(r => {
+        doc.text(`Q${r.number}: ${r.status}`, 10, y);
+        y += 6;
+        doc.text(`Selected: ${r.selected}`, 15, y);
+        y += 6;
+        doc.text(`Correct: ${r.correct}`, 15, y);
+        y += 8;
+        if (y > 270) {
+          doc.addPage();
+          y = 10;
+        }
+      });
+
+      if (Object.keys(weaknesses).length) {
+        doc.text(`\nRecommended Review Topics:`, 10, y);
+        y += 10;
+        Object.entries(weaknesses).forEach(([topic, count]) => {
+          doc.text(`- ${topic} (missed ${count})`, 15, y);
+          y += 6;
+        });
+      }
+
+      doc.save("quiz_report.pdf");
+    }
   </script>
 </body>
 </html>
