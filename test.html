@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MEA Economics Club - AP Micro 2.1–2.4 Quiz</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background-color: #BCD2C6;
+      margin: 0;
+      padding: 2rem;
+      color: #333;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    header img {
+      height: 80px;
+      margin-bottom: 1rem;
+    }
+    h1 {
+      font-size: 2rem;
+      margin: 0.2rem;
+    }
+    h2 {
+      font-weight: normal;
+      font-size: 1.2rem;
+      color: #555;
+    }
+    form {
+      max-width: 900px;
+      margin: auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .question {
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+      border-radius: 8px;
+    }
+    .missed {
+      background-color: #ffe6e6;
+      border: 1px solid #ff6666;
+    }
+    .question p {
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+    .result {
+      margin-top: 2rem;
+      font-weight: bold;
+    }
+    .correct { color: green; }
+    .incorrect { color: red; }
+    button {
+      display: block;
+      margin: 1rem auto;
+      background-color: #4caf50;
+      color: white;
+      padding: 0.7rem 1.5rem;
+      border: none;
+      font-size: 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #F194A0;
+    }
+    #progressBarContainer {
+      width: 100%;
+      background-color: #ccc;
+      border-radius: 10px;
+      margin: 20px auto;
+      height: 20px;
+    }
+    #progressBar {
+      height: 100%;
+      background-color: #4caf50;
+      width: 0%;
+      border-radius: 10px;
+      transition: width 0.3s;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="MEA%20Economics%20Club%20Logo%20(original).png" alt="MEA Economics Club Logo">
+    <h1>AP Microeconomics Quiz: Demand, Supply, and Elasticities (Units 2.1–2.4)</h1>
+  </header>
+
+  <div id="progressBarContainer"><div id="progressBar"></div></div>
+
+  <form id="quizForm">
+    <div id="quiz"></div>
+    <button type="submit">Submit Quiz</button>
+    <div id="result" class="result"></div>
+    <button id="downloadBtn" style="display:none;">Download PDF Report</button>
+  </form>
+
+  <script>
+    const { jsPDF } = window.jspdf;
+    const questions = [/* insert 25 question objects from previous version here */];
+
+    const quizDiv = document.getElementById("quiz");
+
+    questions.forEach((q, i) => {
+      const qDiv = document.createElement("div");
+      qDiv.className = "question";
+      qDiv.id = `qbox-${i}`;
+
+      const qText = document.createElement("p");
+      qText.textContent = q.q;
+      qDiv.appendChild(qText);
+
+      if (q.options) {
+        q.options.forEach(opt => {
+          const label = document.createElement("label");
+          const input = document.createElement("input");
+          input.type = "radio";
+          input.name = `q${i}`;
+          input.value = opt;
+          input.required = true;
+          input.addEventListener("change", updateProgress);
+          label.appendChild(input);
+          label.append(` ${opt}`);
+          qDiv.appendChild(label);
+          qDiv.appendChild(document.createElement("br"));
+        });
+      } else {
+        const input = document.createElement("input");
+        input.type = "number";
+        input.name = `q${i}`;
+        input.step = "any";
+        input.required = true;
+        input.addEventListener("input", updateProgress);
+        qDiv.appendChild(input);
+      }
+
+      quizDiv.appendChild(qDiv);
+    });
+
+    function updateProgress() {
+      const total = questions.length;
+      let filled = 0;
+      for (let i = 0; i < total; i++) {
+        const el = document.forms["quizForm"][`q${i}`];
+        if (el.length) {
+          for (const opt of el) if (opt.checked) filled++;
+        } else if (el.value.trim() !== "") filled++;
+      }
+      const percentage = (filled / total) * 100;
+      document.getElementById("progressBar").style.width = percentage + "%";
+    }
+
+    document.getElementById("quizForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      let score = 0;
+      const weaknesses = {};
+      const report = [];
+
+      questions.forEach((q, i) => {
+        const input = document.forms["quizForm"][`q${i}`];
+        const value = input.length ? [...input].find(r => r.checked)?.value : input.value;
+        const correctVal = parseFloat(q.correct);
+        const userVal = parseFloat(value);
+        const isCorrect = !isNaN(correctVal) && !isNaN(userVal) ? Math.abs(correctVal - userVal) < 0.01 : value?.toLowerCase() === q.correct.toLowerCase();
+
+        if (isCorrect) score++;
+        else {
+          weaknesses[q.concept] = (weaknesses[q.concept] || 0) + 1;
+          document.getElementById(`qbox-${i}`).classList.add("missed");
+        }
+
+        if (input.length) for (const inp of input) inp.disabled = true;
+        else input.disabled = true;
+
+        report.push(`Q${i+1}: ${q.q}\nAnswer: ${value || "None"}\nCorrect: ${q.correct}\nStatus: ${isCorrect ? "Correct" : "Incorrect"}\n`);
+      });
+
+      const resultDiv = document.getElementById("result");
+      resultDiv.innerHTML = `<p>Your score: ${score} / ${questions.length}</p>`;
+      const weakAreas = Object.keys(weaknesses);
+      if (weakAreas.length) {
+        resultDiv.innerHTML += `<h3>Recommended Topics to Review:</h3><ul>${weakAreas.map(concept => `<li>${concept} (${weaknesses[concept]} missed)</li>`).join('')}</ul>`;
+      }
+
+      document.querySelector("button[type='submit']").disabled = true;
+      document.getElementById("downloadBtn").style.display = "block";
+
+      document.getElementById("downloadBtn").onclick = () => {
+        const pdf = new jsPDF();
+        pdf.setFontSize(12);
+        pdf.text(`AP Microeconomics Quiz Report\nScore: ${score}/${questions.length}\n`, 10, 10);
+        let y = 20;
+        report.forEach(r => {
+          const lines = pdf.splitTextToSize(r, 180);
+          pdf.text(lines, 10, y);
+          y += lines.length * 6;
+        });
+        if (weakAreas.length) {
+          pdf.text("\nRecommended Review Topics:", 10, y);
+          y += 10;
+          weakAreas.forEach(w => pdf.text(`- ${w}`, 10, y += 6));
+        }
+        pdf.save("quiz_report.pdf");
+      }
+    });
+  </script>
+</body>
+</html>
